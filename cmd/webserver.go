@@ -2,15 +2,20 @@ package main
 
 import (
 	"dreamt/pkg/api"
+	"dreamt/pkg/api/models"
 	"dreamt/pkg/controller"
 	"dreamt/pkg/persistence/postgres"
-	"net/http"
+	"log"
 )
 
 func main() {
 	dbController := postgres.NewPGController("")
 	ctr := controller.NewController(dbController)
-	api := api.NewAPI(&ctr, nil)
+	webApp := models.Fiber
+	// webApp = models.GorillaMux
+	api := api.NewAPI(&ctr, ":8080", webApp, nil)
+
+	// start command line interface
 	// start http server
-	http.ListenAndServe(":8080", api.Router)
+	log.Fatal(api.Run())
 }

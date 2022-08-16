@@ -25,7 +25,7 @@ func sendResp(w http.ResponseWriter, body interface{}) {
 
 func (a API) GetDreams(w http.ResponseWriter, r *http.Request) {
 	// get dreams from controller
-	dreams, err := a.Controller.GetDreams()
+	dreams, err := a.controller.GetDreams()
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -41,7 +41,7 @@ func (a API) GetDream(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 
 	// get dreams from controller
-	dream, err := a.Controller.GetDream(id)
+	dream, err := a.controller.GetDream(id)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -57,7 +57,7 @@ func (a API) GetInterpretation(w http.ResponseWriter, r *http.Request) {
 	keyword := vars["keyword"]
 
 	// get interpretation from controller
-	interpret, err := a.Controller.GetInterpret(keyword)
+	interpret, err := a.controller.GetInterpret(keyword)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -81,7 +81,7 @@ func (a API) GetKeywords(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get keywords from controller
-	keywords, err := a.Controller.GetKeywords(top)
+	keywords, err := a.controller.GetKeywords(top)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -100,7 +100,7 @@ func (a API) CreateDream(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create dream in controller
-	id, err := a.Controller.WriteDreams(dream)
+	id, err := a.controller.WriteDreams(dream)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -116,7 +116,7 @@ func (a API) DeleteDream(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 
 	// delete dream in controller
-	if err := a.Controller.DeleteDream(id); err != nil {
+	if err := a.controller.DeleteDream(id); err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
