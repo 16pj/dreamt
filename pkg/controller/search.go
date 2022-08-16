@@ -1,6 +1,9 @@
 package controller
 
-import "dreamt/pkg/models"
+import (
+	"dreamt/pkg/logic"
+	"dreamt/pkg/models"
+)
 
 func (c Controller) GetKeywords(top int) ([]string, error) {
 	dreams, err := c.DBController.GetDreamsFull()
@@ -8,22 +11,12 @@ func (c Controller) GetKeywords(top int) ([]string, error) {
 		return nil, err
 	}
 
-	finalKeywords := []string{}
-
+	blob := ""
 	for _, dream := range dreams {
-		keywords := extractKwFromDream(dream, top)
-		for _, kw := range keywords {
-			if !contains(finalKeywords, kw) {
-				finalKeywords = append(finalKeywords, kw)
-			}
-
-			if len(finalKeywords) >= top {
-				return finalKeywords, nil
-			}
-		}
+		blob += dream.Content + " " + dream.Title + " "
 	}
 
-	return finalKeywords, nil
+	return logic.MostFrequentWords(blob, top), nil
 }
 
 func (c Controller) GetInterpret(kw string) (models.Interpretation, error) {

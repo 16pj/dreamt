@@ -1,17 +1,11 @@
-package controller
+package logic
 
 import (
-	"dreamt/pkg/models"
-
 	textrank "github.com/DavidBelicza/TextRank/v2"
 )
 
-func extractKwFromDream(dream models.Dream, top int) []string {
-	return mostFrequentWords(dream.Title+" "+dream.Content, top)
-}
-
 // return the most frequent words from string
-func mostFrequentWords(sentence string, top int) []string {
+func MostFrequentWords(sentence string, top int) []string {
 	kw := []string{}
 
 	tr := textrank.NewTextRank()
@@ -33,7 +27,7 @@ func mostFrequentWords(sentence string, top int) []string {
 	return kw
 }
 
-func contains[T comparable](slice []T, kw T) bool {
+func Contains[T comparable](slice []T, kw T) bool {
 	for _, s := range slice {
 		if s == kw {
 			return true

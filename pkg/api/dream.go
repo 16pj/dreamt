@@ -1,126 +1,106 @@
 package api
 
 import (
-	"dreamt/pkg/models"
-	"encoding/json"
+	rmodels "dreamt/pkg/api/models"
+	"errors"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
-func sendError(w http.ResponseWriter, status int, errMsg string) {
-	w.WriteHeader(status)
-	w.Write([]byte(errMsg))
-}
-
-func sendResp(w http.ResponseWriter, body interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	if err := json.NewEncoder(w).Encode(body); err != nil {
-		sendError(w, http.StatusInternalServerError, err.Error())
-	}
-}
-
-func (a API) GetDreams(w http.ResponseWriter, r *http.Request) {
+func (a API) getDreams() rmodels.APIResponse {
 	// get dreams from controller
 	dreams, err := a.controller.GetDreams()
 	if err != nil {
-		sendError(w, http.StatusInternalServerError, err.Error())
-		return
+		return rmodels.APIResponse{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 
 	// write response
-	sendResp(w, dreams)
+	return rmodels.APIResponse{Status: http.StatusOK, Body: dreams}
 }
 
-func (a API) GetDream(w http.ResponseWriter, r *http.Request) {
-	// get id from url
-	vars := mux.Vars(r)
-	id := vars["id"]
-
+func (a API) getDream(r rmodels.GetDreamRequest) rmodels.APIResponse {
 	// get dreams from controller
-	dream, err := a.controller.GetDream(id)
+	dream, err := a.controller.GetDream(r.ID)
 	if err != nil {
-		sendError(w, http.StatusInternalServerError, err.Error())
-		return
+		return rmodels.APIResponse{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 
 	// write response
-	sendResp(w, dream)
+	return rmodels.APIResponse{Body: dream, Status: http.StatusOK}
 }
 
-func (a API) GetInterpretation(w http.ResponseWriter, r *http.Request) {
-	// get keyword from url
-	vars := mux.Vars(r)
-	keyword := vars["keyword"]
-
+func (a API) getInterpret(r rmodels.GetInterpretationRequest) rmodels.APIResponse {
 	// get interpretation from controller
-	interpret, err := a.controller.GetInterpret(keyword)
+	interpret, err := a.controller.GetInterpret(r.Keyword)
 	if err != nil {
-		sendError(w, http.StatusInternalServerError, err.Error())
-		return
+		return rmodels.APIResponse{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 
 	// write response
-	sendResp(w, interpret)
+	return rmodels.APIResponse{Body: interpret, Status: http.StatusOK}
 }
 
-func (a API) GetKeywords(w http.ResponseWriter, r *http.Request) {
+func (a API) getKeywords(r rmodels.GetKeywordsRequest) rmodels.APIResponse {
 	// get top from query
-	limit := r.URL.Query().Get("limit")
+	limit := r.Limit
 	if limit == "" {
 		limit = "10"
 	}
 
 	top, err := strconv.Atoi(limit)
 	if err != nil {
-		sendError(w, http.StatusBadRequest, "limit must be an integer")
-		return
+		return rmodels.APIResponse{
+			Status: http.StatusBadRequest,
+			Err:    errors.New("limit must be an integer: " + err.Error()),
+		}
 	}
 
 	// get keywords from controller
 	keywords, err := a.controller.GetKeywords(top)
 	if err != nil {
-		sendError(w, http.StatusInternalServerError, err.Error())
-		return
+		return rmodels.APIResponse{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 
 	// write response
-	sendResp(w, keywords)
+	return rmodels.APIResponse{Status: http.StatusOK, Body: keywords}
 }
 
-func (a API) CreateDream(w http.ResponseWriter, r *http.Request) {
-	// get dream from body
-	var dream models.Dream
-	if err := json.NewDecoder(r.Body).Decode(&dream); err != nil {
-		sendError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
+func (a API) createDream(r rmodels.CreateDreamRequest) rmodels.APIResponse {
 	// create dream in controller
-	id, err := a.controller.WriteDreams(dream)
+	id, err := a.controller.WriteDreams(r.Dream)
 	if err != nil {
-		sendError(w, http.StatusInternalServerError, err.Error())
-		return
+		return rmodels.APIResponse{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 
 	// write response
-	sendResp(w, id)
+	return rmodels.APIResponse{Status: http.StatusCreated, Body: id}
 }
 
-func (a API) DeleteDream(w http.ResponseWriter, r *http.Request) {
+func (a API) deleteDream(r rmodels.DeleteDreamRequest) rmodels.APIResponse {
 	// get id from url
-	vars := mux.Vars(r)
-	id := vars["id"]
-
 	// delete dream in controller
-	if err := a.controller.DeleteDream(id); err != nil {
-		sendError(w, http.StatusInternalServerError, err.Error())
-		return
+	if err := a.controller.DeleteDream(r.ID); err != nil {
+		return rmodels.APIResponse{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 
 	// write response
-	sendResp(w, "ok")
+	return rmodels.APIResponse{Status: http.StatusOK, Body: "ok"}
 }

@@ -1,4 +1,4 @@
-package api
+package app
 
 import (
 	"net/http"
@@ -14,49 +14,49 @@ type Route struct {
 	FiberHandlerFunc fiber.Handler
 }
 
-func getRoutes(api *API) []Route {
+func getRoutes(app *App) []Route {
 	return []Route{
 		{
 			Name:             "GetDreams",
 			Method:           "GET",
 			Path:             "/dreams",
-			HandlerFunc:      api.GetDreams,
-			FiberHandlerFunc: api.FGetDreams,
+			HandlerFunc:      app.gorillaApp.GetDreams,
+			FiberHandlerFunc: app.fiberApp.FGetDreams,
 		},
 		{
 			Name:             "GetDream",
 			Method:           "GET",
-			Path:             "/dreams/:id",
-			HandlerFunc:      api.GetDream,
-			FiberHandlerFunc: api.FGetDream,
+			Path:             "/dreams/{id}",
+			HandlerFunc:      app.gorillaApp.GetDream,
+			FiberHandlerFunc: app.fiberApp.FGetDream,
 		},
 		{
 			Name:             "GetInterpretation",
 			Method:           "GET",
 			Path:             "/interpret/{keyword}",
-			HandlerFunc:      api.GetInterpretation,
-			FiberHandlerFunc: api.FGetInterpretation,
+			HandlerFunc:      app.gorillaApp.GetInterpretation,
+			FiberHandlerFunc: app.fiberApp.FGetInterpretation,
 		},
 		{
 			Name:             "GetKeywords",
 			Method:           "GET",
 			Path:             "/keywords",
-			HandlerFunc:      api.GetKeywords,
-			FiberHandlerFunc: api.FGetKeywords,
+			HandlerFunc:      app.gorillaApp.GetKeywords,
+			FiberHandlerFunc: app.fiberApp.FGetKeywords,
 		},
 		{
 			Name:             "CreateDream",
 			Method:           "POST",
 			Path:             "/dream",
-			HandlerFunc:      api.CreateDream,
-			FiberHandlerFunc: api.FCreateDream,
+			HandlerFunc:      app.gorillaApp.CreateDream,
+			FiberHandlerFunc: app.fiberApp.FCreateDream,
 		},
 		{
 			Name:             "DeleteDream",
 			Method:           "DELETE",
 			Path:             "/dreams/{id}",
-			HandlerFunc:      api.DeleteDream,
-			FiberHandlerFunc: api.FDeleteDream,
+			HandlerFunc:      app.gorillaApp.DeleteDream,
+			FiberHandlerFunc: app.fiberApp.FDeleteDream,
 		},
 	}
 }

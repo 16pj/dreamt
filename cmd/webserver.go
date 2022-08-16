@@ -3,6 +3,7 @@ package main
 import (
 	"dreamt/pkg/api"
 	"dreamt/pkg/api/models"
+	"dreamt/pkg/app"
 	"dreamt/pkg/controller"
 	"dreamt/pkg/persistence/postgres"
 	"log"
@@ -13,9 +14,10 @@ func main() {
 	ctr := controller.NewController(dbController)
 	webApp := models.Fiber
 	// webApp = models.GorillaMux
-	api := api.NewAPI(&ctr, ":8080", webApp, nil)
+	myAPI := api.NewAPI(&ctr, nil)
+	app := app.AppFactory(myAPI, webApp, ":8080")
 
 	// start command line interface
 	// start http server
-	log.Fatal(api.Run())
+	log.Fatal(app.Run())
 }

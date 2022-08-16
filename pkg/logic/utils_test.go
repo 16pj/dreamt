@@ -1,11 +1,11 @@
-package controller
+package logic
 
 import (
 	"reflect"
 	"testing"
 )
 
-func Test_mostFrequentWords(t *testing.T) {
+func Test_MostFrequentWords(t *testing.T) {
 	type args struct {
 		sentence string
 	}
@@ -24,7 +24,7 @@ func Test_mostFrequentWords(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := mostFrequentWords(tt.args.sentence, 2); !reflect.DeepEqual(got, tt.want) {
+			if got := MostFrequentWords(tt.args.sentence, 2); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("mostFrequentWords() = %v, want %v", got, tt.want)
 			}
 		})
