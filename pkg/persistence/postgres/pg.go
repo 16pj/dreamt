@@ -3,6 +3,7 @@ package postgres
 //import gorm
 import (
 	"dreamt/pkg/models"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -14,7 +15,7 @@ type PGController struct {
 
 func NewPGController(dsn string) PGController {
 	if dsn == "" {
-		dsn = "host=localhost port=5432 user=dbuser dbname=test password=dbuser sslmode=disable"
+		dsn = "host=localhost port=5432 user=dbuser dbname=test3 password=dbuser sslmode=disable"
 	}
 
 	db, err := gorm.Open("postgres", dsn)
@@ -33,7 +34,7 @@ func NewPGController(dsn string) PGController {
 
 func (p PGController) GetDreams() ([]models.DreamHeader, error) {
 	dreamHeaders := []models.DreamHeader{}
-	var pgDoc []DreamPG
+	var pgDoc []Dream
 	if err := p.DB.Select("id, title").Find(&pgDoc).Error; err != nil {
 		return nil, err
 	}
@@ -49,11 +50,10 @@ func (p PGController) GetDreams() ([]models.DreamHeader, error) {
 }
 
 func (p PGController) GetDream(id string) (models.Dream, error) {
-	var pgDoc DreamPG
+	var pgDoc Dream
 
 	if err := p.DB.Debug().
-		Select("dream_pgs.*, tags_pgs.name").
-		Joins("JOIN tags_pgs ON tags_pgs.dream_id = dream_pgs.id").
+		Preload("Tags").
 		First(&pgDoc, id).Error; err != nil {
 		return models.Dream{}, err
 	}
@@ -64,6 +64,8 @@ func (p PGController) GetDream(id string) (models.Dream, error) {
 		Content: pgDoc.Content,
 	}
 
+	fmt.Println(pgDoc.Tags)
+
 	for _, tag := range pgDoc.Tags {
 		dream.Tags = append(dream.Tags, tag.Name)
 	}
@@ -72,13 +74,13 @@ func (p PGController) GetDream(id string) (models.Dream, error) {
 }
 
 func (p PGController) WriteDreams(dream models.Dream) (int64, error) {
-	pgDoc := DreamPG{
+	pgDoc := Dream{
 		Title:   dream.Title,
 		Content: dream.Content,
 	}
 
 	for _, tag := range dream.Tags {
-		pgDoc.Tags = append(pgDoc.Tags, TagsPG{
+		pgDoc.Tags = append(pgDoc.Tags, Tag{
 			Name: tag,
 		})
 	}
@@ -88,13 +90,13 @@ func (p PGController) WriteDreams(dream models.Dream) (int64, error) {
 }
 
 func (p PGController) DeleteDream(id string) error {
-	err := p.DB.Delete(&DreamPG{}, id).Error
+	err := p.DB.Delete(&Dream{}, id).Error
 	return err
 }
 
 func (p PGController) GetDreamsFull() ([]models.Dream, error) {
 	dreams := []models.Dream{}
-	var pgDoc []DreamPG
+	var pgDoc []Dream
 	if err := p.DB.Find(&pgDoc).Error; err != nil {
 		return nil, err
 	}
