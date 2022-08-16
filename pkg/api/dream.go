@@ -3,6 +3,7 @@ package api
 import (
 	rmodels "dreamt/pkg/api/models"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -11,6 +12,7 @@ func (a API) getDreams() rmodels.APIResponse {
 	// get dreams from controller
 	dreams, err := a.controller.GetDreams()
 	if err != nil {
+		fmt.Println("err: ", err)
 		return rmodels.APIResponse{
 			Status: http.StatusInternalServerError,
 			Err:    err,
@@ -25,6 +27,7 @@ func (a API) getDream(r rmodels.GetDreamRequest) rmodels.APIResponse {
 	// get dreams from controller
 	dream, err := a.controller.GetDream(r.ID)
 	if err != nil {
+		fmt.Println("err: ", err)
 		return rmodels.APIResponse{
 			Status: http.StatusInternalServerError,
 			Err:    err,
@@ -81,6 +84,7 @@ func (a API) createDream(r rmodels.CreateDreamRequest) rmodels.APIResponse {
 	// create dream in controller
 	id, err := a.controller.WriteDreams(r.Dream)
 	if err != nil {
+		fmt.Println("err: ", err)
 		return rmodels.APIResponse{
 			Status: http.StatusInternalServerError,
 			Err:    err,

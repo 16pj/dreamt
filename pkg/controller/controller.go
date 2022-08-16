@@ -1,12 +1,14 @@
 package controller
 
-import "dreamt/pkg/persistence/postgres"
+import (
+	"dreamt/pkg/persistence"
+)
 
 type Controller struct {
-	DBController postgres.PGController
+	DBController persistence.DatabaseController
 }
 
-func NewController(dbController postgres.PGController) Controller {
+func NewController(dbController persistence.DatabaseController) Controller {
 	return Controller{
 		DBController: dbController,
 	}

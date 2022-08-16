@@ -1,9 +1,9 @@
 package models
 
 // create an enum
-type WebApp string
+type WebApp int
 
 const (
-	GorillaMux WebApp = "gorilla"
-	Fiber      WebApp = "fiber"
+	GorillaMux WebApp = iota
+	Fiber
 )

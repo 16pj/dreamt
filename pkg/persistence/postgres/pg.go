@@ -3,6 +3,7 @@ package postgres
 //import gorm
 import (
 	"dreamt/pkg/models"
+	"dreamt/pkg/persistence"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
@@ -10,10 +11,10 @@ import (
 )
 
 type PGController struct {
-	DB *gorm.DB
+	db *gorm.DB
 }
 
-func NewPGController(dsn string) PGController {
+func NewPGController(dsn string) persistence.DatabaseController {
 	if dsn == "" {
 		dsn = "host=localhost port=5432 user=dbuser dbname=test3 password=dbuser sslmode=disable"
 	}
@@ -23,25 +24,25 @@ func NewPGController(dsn string) PGController {
 		panic(err)
 	}
 
-	for _, t := range tablesToMigrate {
+	for _, t := range persistence.TablesToMigrate {
 		db.AutoMigrate(t)
 	}
 
 	return PGController{
-		DB: db,
+		db: db,
 	}
 }
 
 func (p PGController) GetDreams() ([]models.DreamHeader, error) {
 	dreamHeaders := []models.DreamHeader{}
-	var pgDoc []Dream
-	if err := p.DB.Select("id, title").Find(&pgDoc).Error; err != nil {
+	var pgDoc []persistence.DreamPG
+	if err := p.db.Select("id, title").Find(&pgDoc).Error; err != nil {
 		return nil, err
 	}
 
 	for _, dream := range pgDoc {
 		dreamHeaders = append(dreamHeaders, models.DreamHeader{
-			Id:    dream.ID,
+			ID:    dream.ID,
 			Title: dream.Title,
 		})
 	}
@@ -50,16 +51,16 @@ func (p PGController) GetDreams() ([]models.DreamHeader, error) {
 }
 
 func (p PGController) GetDream(id string) (models.Dream, error) {
-	var pgDoc Dream
+	var pgDoc persistence.DreamPG
 
-	if err := p.DB.Debug().
+	if err := p.db.Debug().
 		Preload("Tags").
 		First(&pgDoc, id).Error; err != nil {
 		return models.Dream{}, err
 	}
 
 	dream := models.Dream{
-		Id:      pgDoc.ID,
+		ID:      pgDoc.ID,
 		Title:   pgDoc.Title,
 		Content: pgDoc.Content,
 	}
@@ -74,36 +75,35 @@ func (p PGController) GetDream(id string) (models.Dream, error) {
 }
 
 func (p PGController) WriteDreams(dream models.Dream) (int64, error) {
-	pgDoc := Dream{
+	pgDoc := persistence.DreamPG{
 		Title:   dream.Title,
-		Content: dream.Content,
-	}
+		Content: dream.Content}
 
 	for _, tag := range dream.Tags {
-		pgDoc.Tags = append(pgDoc.Tags, Tag{
+		pgDoc.Tags = append(pgDoc.Tags, persistence.Tag{
 			Name: tag,
 		})
 	}
 
-	err := p.DB.Create(&pgDoc).Error
+	err := p.db.Create(&pgDoc).Error
 	return pgDoc.ID, err
 }
 
 func (p PGController) DeleteDream(id string) error {
-	err := p.DB.Delete(&Dream{}, id).Error
+	err := p.db.Delete(&persistence.DreamPG{}, id).Error
 	return err
 }
 
 func (p PGController) GetDreamsFull() ([]models.Dream, error) {
 	dreams := []models.Dream{}
-	var pgDoc []Dream
-	if err := p.DB.Find(&pgDoc).Error; err != nil {
+	var pgDoc []persistence.DreamPG
+	if err := p.db.Find(&pgDoc).Error; err != nil {
 		return nil, err
 	}
 
 	for _, dream := range pgDoc {
 		dreams = append(dreams, models.Dream{
-			Id:      dream.ID,
+			ID:      dream.ID,
 			Title:   dream.Title,
 			Content: dream.Content,
 		})
