@@ -1,6 +1,7 @@
-package api
+package gorilla
 
 import (
+	"dreamt/pkg/api"
 	rmodels "dreamt/pkg/api/models"
 	"dreamt/pkg/models"
 	"encoding/json"
@@ -11,10 +12,10 @@ import (
 
 type GorillaAPI struct {
 	*mux.Router
-	*API
+	*api.API
 }
 
-func NewGorillaAPI(api *API) *GorillaAPI {
+func NewGorillaAPI(api *api.API) *GorillaAPI {
 	return &GorillaAPI{
 		mux.NewRouter(),
 		api,
@@ -38,7 +39,7 @@ func sendResp(w http.ResponseWriter, resp rmodels.APIResponse) {
 
 func (g GorillaAPI) GetDreams(w http.ResponseWriter, r *http.Request) {
 	// get dreams from controller
-	sendResp(w, g.getDreams())
+	sendResp(w, g.API.GetDreams())
 }
 
 func (g GorillaAPI) GetDream(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +48,7 @@ func (g GorillaAPI) GetDream(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 
 	// get dreams from controller
-	sendResp(w, g.getDream(rmodels.GetDreamRequest{ID: id}))
+	sendResp(w, g.API.GetDream(rmodels.GetDreamRequest{ID: id}))
 }
 
 func (g GorillaAPI) GetInterpretation(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +57,7 @@ func (g GorillaAPI) GetInterpretation(w http.ResponseWriter, r *http.Request) {
 	keyword := vars["keyword"]
 
 	// get interpretation from controller
-	sendResp(w, g.getInterpret(rmodels.GetInterpretationRequest{Keyword: keyword}))
+	sendResp(w, g.GetInterpret(rmodels.GetInterpretationRequest{Keyword: keyword}))
 }
 
 func (g GorillaAPI) GetKeywords(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +65,7 @@ func (g GorillaAPI) GetKeywords(w http.ResponseWriter, r *http.Request) {
 	limit := r.URL.Query().Get("limit")
 
 	// get keywords from controller
-	sendResp(w, g.getKeywords(rmodels.GetKeywordsRequest{Limit: limit}))
+	sendResp(w, g.API.GetKeywords(rmodels.GetKeywordsRequest{Limit: limit}))
 }
 
 func (g GorillaAPI) CreateDream(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +77,7 @@ func (g GorillaAPI) CreateDream(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create dream in controller
-	sendResp(w, g.createDream(rmodels.CreateDreamRequest{Dream: dream}))
+	sendResp(w, g.API.CreateDream(rmodels.CreateDreamRequest{Dream: dream}))
 }
 
 func (g GorillaAPI) DeleteDream(w http.ResponseWriter, r *http.Request) {
@@ -85,5 +86,5 @@ func (g GorillaAPI) DeleteDream(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 
 	// delete dream in controller
-	sendResp(w, g.deleteDream(rmodels.DeleteDreamRequest{ID: id}))
+	sendResp(w, g.API.DeleteDream(rmodels.DeleteDreamRequest{ID: id}))
 }

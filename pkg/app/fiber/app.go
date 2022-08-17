@@ -1,6 +1,7 @@
-package api
+package fiber
 
 import (
+	"dreamt/pkg/api"
 	rmodels "dreamt/pkg/api/models"
 	"dreamt/pkg/models"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 
 type FiberAPI struct {
 	*fiber.App
-	*API
+	*api.API
 }
 
 func sendFiberResp(c *fiber.Ctx, resp rmodels.APIResponse) error {
@@ -22,7 +23,7 @@ func sendFiberResp(c *fiber.Ctx, resp rmodels.APIResponse) error {
 	return c.Status(resp.Status).JSON(resp.Body)
 }
 
-func NewFiberAPI(api *API) *FiberAPI {
+func NewFiberAPI(api *api.API) *FiberAPI {
 	return &FiberAPI{
 		fiber.New(),
 		api,
@@ -31,14 +32,14 @@ func NewFiberAPI(api *API) *FiberAPI {
 
 func (f FiberAPI) FGetDreams(c *fiber.Ctx) error {
 	// get dreams from controller
-	return sendFiberResp(c, f.getDreams())
+	return sendFiberResp(c, f.GetDreams())
 }
 
 func (f FiberAPI) FGetDream(c *fiber.Ctx) error {
 	// get id from url
 	id := c.Params("id")
 	// get dreams from controller
-	return sendFiberResp(c, f.getDream(rmodels.GetDreamRequest{ID: id}))
+	return sendFiberResp(c, f.GetDream(rmodels.GetDreamRequest{ID: id}))
 }
 
 func (f FiberAPI) FGetInterpretation(c *fiber.Ctx) error {
@@ -46,7 +47,7 @@ func (f FiberAPI) FGetInterpretation(c *fiber.Ctx) error {
 	keyword := c.Params("keyword")
 
 	// get interpretation from controller
-	return sendFiberResp(c, f.getInterpret(rmodels.GetInterpretationRequest{Keyword: keyword}))
+	return sendFiberResp(c, f.GetInterpret(rmodels.GetInterpretationRequest{Keyword: keyword}))
 }
 
 func (f FiberAPI) FGetKeywords(c *fiber.Ctx) error {
@@ -54,7 +55,7 @@ func (f FiberAPI) FGetKeywords(c *fiber.Ctx) error {
 	limit := c.Query("limit")
 
 	// get keywords from controller
-	return sendFiberResp(c, f.getKeywords(rmodels.GetKeywordsRequest{Limit: limit}))
+	return sendFiberResp(c, f.GetKeywords(rmodels.GetKeywordsRequest{Limit: limit}))
 }
 
 func (f FiberAPI) FCreateDream(c *fiber.Ctx) error {
@@ -65,7 +66,7 @@ func (f FiberAPI) FCreateDream(c *fiber.Ctx) error {
 	}
 
 	// create dream in controller
-	return sendFiberResp(c, f.createDream(rmodels.CreateDreamRequest{Dream: dream}))
+	return sendFiberResp(c, f.CreateDream(rmodels.CreateDreamRequest{Dream: dream}))
 }
 
 func (f FiberAPI) FDeleteDream(c *fiber.Ctx) error {
@@ -73,5 +74,5 @@ func (f FiberAPI) FDeleteDream(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	// delete dream in controller
-	return sendFiberResp(c, f.deleteDream(rmodels.DeleteDreamRequest{ID: id}))
+	return sendFiberResp(c, f.DeleteDream(rmodels.DeleteDreamRequest{ID: id}))
 }

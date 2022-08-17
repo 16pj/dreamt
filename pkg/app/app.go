@@ -3,14 +3,16 @@ package app
 import (
 	"dreamt/pkg/api"
 	"dreamt/pkg/api/models"
+	"dreamt/pkg/app/fiber"
+	"dreamt/pkg/app/gorilla"
 	"net/http"
 	"strings"
 )
 
 type App struct {
 	webApp     models.WebApp
-	fiberApp   *api.FiberAPI
-	gorillaApp *api.GorillaAPI
+	fiberApp   *fiber.FiberAPI
+	gorillaApp *gorilla.GorillaAPI
 	addr       string
 }
 
@@ -18,15 +20,15 @@ func AppFactory(myAPI *api.API, webApp models.WebApp, addr string) *App {
 	app := App{
 		webApp:     webApp,
 		addr:       addr,
-		fiberApp:   &api.FiberAPI{},
-		gorillaApp: &api.GorillaAPI{},
+		fiberApp:   &fiber.FiberAPI{},
+		gorillaApp: &gorilla.GorillaAPI{},
 	}
 
 	switch webApp {
 	case models.Fiber:
-		app.fiberApp = api.NewFiberAPI(myAPI)
+		app.fiberApp = fiber.NewFiberAPI(myAPI)
 	default:
-		app.gorillaApp = api.NewGorillaAPI(myAPI)
+		app.gorillaApp = gorilla.NewGorillaAPI(myAPI)
 	}
 
 	return handleRoutes(&app)
